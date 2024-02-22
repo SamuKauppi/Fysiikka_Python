@@ -5,8 +5,9 @@ from matplotlib.patches import Polygon
 
 
 # Coordinates of our triangle
-pts = np.array([[3,3], [2,5], [5,2]])
+pts = np.array([[2,2], [2,4], [4,2]])
 p = Polygon(pts)
+Polygon.set_fill(p, False)
 ax = plt.gca()
 ax.add_patch(p)
 ax.set_xlim(1,7)
