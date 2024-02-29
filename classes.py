@@ -13,16 +13,22 @@ class Object:
 
         # Triangle at origo
         self.object_at_origo = points
-        
+
         # Determine object at position
-        self.object = points
-        for p in self.object:
-            p[0] += xoffset
-            p[1] += yoffset
+        self.object = [[x + xoffset, y + yoffset] for x, y in points]
 
         # determine center of mass
-        cmx = 1/3 * (self.object[0][0] + self.object[1][0] + self.object[2][0])
-        cmy = 1/3 * (self.object[0][1] + self.object[1][1] + self.object[2][1])
+        sumx = 0
+        for x in self.object:
+            sumx += x[0]
+        cmx = 1/len(points) * (sumx)
+
+        sumy = 0
+        for x in self.object:
+            sumy += x[1]
+
+        cmy = 1/len(points) * (sumy)
+        
         self.cm = [[cmx, cmy]]
 
 
@@ -36,11 +42,15 @@ class Object:
     
     def get_new_rotation(self):
         dr = self.wv * self.dt
+
+        rotated_point = [point[:] for point in self.object_at_origo]
         i = 0
-        for p in self.object_at_origo:
-            self.object_at_origo[i][0] = p[0] * cos(dr) - p[1] * sin(dr)
-            self.object_at_origo[i][1] = p[1] * sin(dr) + p[1] * cos(dr)
+        for p in rotated_point:
+            x, y = p
+            rotated_point[i][0] = x * cos(dr) - y * sin(dr)
+            rotated_point[i][1] = x * sin(dr) + y * cos(dr)
             i += 1
         
-        return self.object_at_origo
+        self.object_at_origo = rotated_point
+        return rotated_point
         
