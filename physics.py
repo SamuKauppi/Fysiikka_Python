@@ -3,7 +3,7 @@ from matplotlib.patches import Polygon
 from math import sin, cos, radians
 
 xoffset = 10
-yoffset = 10
+yoffset = 30
 
 # Starting coordinates of our triangle
 triangle = [[2.0, 0.0], [-1.0, 3.0], [-1.0, -3.0]]
@@ -28,15 +28,15 @@ cm = [
 
 # Movement
 v0 = 17.0   # 10 m/s
-angle = radians(65)
+angle = radians(45)
 vx = v0 * cos(angle)
 vy = v0 * sin(angle)
 g = 9.81    # gravity
 t = 0.0     # time
-dt = 0.15    # delta time
+dt = 0.2    # delta time
 
 # Rotation
-wv = -1.5            # radians/s
+wv = radians(-100)           # radians(deg)/s
 dr = wv * dt
 
 # polygon
@@ -47,7 +47,7 @@ p = Polygon(triangle)
 Polygon.set_fill(p, False)
 polygons.append(p)
 
-while t < 10.0:
+while t < 3.5:
 
     # Center of mass position
     cmx = cm[-1][0] + vx * dt
@@ -85,8 +85,9 @@ for p in polygons:
     ax.add_patch(p)
 
 # Determine plot area size
-ax.set_xlim(-5,50)
+ax.set_xlim(-5,60)
 ax.set_ylim(-5,50)
+ax.set_aspect('equal')
 
 # show plot
 plt.show()
