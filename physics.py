@@ -2,8 +2,8 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon
 from math import sin, cos, radians
 
-xoffset = 2
-yoffset = 2
+xoffset = 10
+yoffset = 10
 
 # Starting coordinates of our triangle
 triangle = [[2.0, 0.0], [-1.0, 3.0], [-1.0, -3.0]]
@@ -33,11 +33,11 @@ vx = v0 * cos(angle)
 vy = v0 * sin(angle)
 g = 9.81    # gravity
 t = 0.0     # time
-dt = 0.05    # delta time
+dt = 0.15    # delta time
 
 # Rotation
-dr = radians(-10)
-wv = dr / dt
+wv = -1.5            # radians/s
+dr = wv * dt
 
 # polygon
 polygons = []
@@ -47,7 +47,7 @@ p = Polygon(triangle)
 Polygon.set_fill(p, False)
 polygons.append(p)
 
-while t < 2.0:
+while t < 10.0:
 
     # Center of mass position
     cmx = cm[-1][0] + vx * dt
@@ -61,6 +61,7 @@ while t < 2.0:
         rotx = triangle_at_origo[i][0] * cos(dr) - triangle_at_origo[i][1] * sin(dr)
         roty = triangle_at_origo[i][0] * sin(dr) + triangle_at_origo[i][1] * cos(dr)
 
+        
         new_triangle[i] = [
             cm[-1][0] + rotx,
             cm[-1][1] + roty
