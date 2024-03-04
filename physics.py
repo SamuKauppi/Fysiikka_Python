@@ -6,7 +6,7 @@ from math import sin, cos, radians
 xoffset = 2
 yoffset = 30
 
-# First objectt dimensions
+# First object dimensions
 object1 = [[0.5, 2.0], [-2.0, 2.0], [-2.0, -2.0], [0.5, -2.0], [3.0, 0.0]]
 
 # Movement
@@ -35,15 +35,8 @@ polygons.append(p)
 
 while t < 10:
 
-    # Center of mass position
-    cm = obj1.get_new_cm()
-
-    # Get rotated object
-    new_object = obj1.get_new_rotation()
-
-    # Move rotated object to center of mass
-    new_object = [[x + cm[0], y + cm[1]] for x, y in new_object]
-
+    obj1.update_position()
+    obj1.hits_ground()
     # TODO: 
     # - ground check
     # - nopeuden muutos
@@ -52,7 +45,7 @@ while t < 10:
     # 
 
     # create a polygon and add it to list
-    poly = Polygon(new_object)
+    poly = Polygon(obj1.object)
     Polygon.set_fill(poly, False)
     polygons.append(poly)
 

@@ -31,6 +31,8 @@ class Object:
         
         self.cm = [[cmx, cmy]]
 
+        self.j = 0.03
+
 
     def get_new_cm(self):
         cmx = self.cm[-1][0] + self.vx * self.dt
@@ -53,4 +55,47 @@ class Object:
         
         self.object_at_origo = rotated_point
         return rotated_point
-        
+    
+    def update_position(self):
+        # Move center of mass
+        self.get_new_cm()
+        # get rotation vector
+        new_object = self.get_new_rotation()
+        # Sum center off mass and rotation
+        new_object = [[x + self.cm[-1][0], y + self.cm[-1][1]] for x, y in new_object]
+        # Update object
+        self.object = new_object
+
+    def hits_ground(self):
+        for point in self.object:
+            # get rp
+            rp = self.get_rp(self.cm[-1][0], self.cm[-1][1], point[0], point[1])
+            # get cross product between rp and angular speed
+            rxw = self.get_wxrp(rp)
+            # get point speed on y-axis
+            vpy = self.vy + rxw[1]
+
+            # check for collision on ground
+            if(point[1] < 0 and vpy < 0):
+
+                rxn = abs(self.get_rxn(rp, [0, 1]))
+
+                # get impulse
+                i = -2 * (self.vy / (1 + ((rxn)**2) / self.j))
+                
+                self.vy += i/1
+
+
+    def get_rp(self, cmx, cmy, px, py):
+        rpx = px - cmx
+        rpy = py - cmy
+        return [rpx, rpy]
+    
+    def get_wxrp(self, rp):
+        rpxwx = -self.wv * rp[1]
+        rpxwy = self.wv * rp[0]
+        return[rpxwx, rpxwy]
+    
+    def get_rxn(self, rp, n):
+        rxn = rp[0] * n[1] - rp[1] * n[0]
+        return rxn
