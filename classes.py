@@ -1,7 +1,13 @@
 from math import sin, cos, radians
 
 class Object:
-    def __init__(self, xoffset, yoffset, speed, angle, rot_speed, points, dt):
+    def __init__(self, xoffset, yoffset, speed, angle, rot_speed, points, dt, e, j):
+
+        self.is_coll = False
+        self.j = j
+        self.e = e
+        self.dt = dt
+        self.m = 10
 
         self.g = 9.81
         angle = radians(45)
@@ -9,7 +15,6 @@ class Object:
         self.vy = speed * sin(angle)
 
         self.wv = radians(rot_speed)
-        self.dt = dt
 
         # Triangle at origo
         self.object_at_origo = points
@@ -31,15 +36,19 @@ class Object:
         
         self.cm = [[cmx, cmy]]
 
-        self.j = 0.03
-
 
     def get_new_cm(self):
         cmx = self.cm[-1][0] + self.vx * self.dt
-        vyl = self.vy - self.g * self.dt
+
+        if self.is_coll == False:
+            vyl = self.vy - self.g * self.dt
+        else:
+            vyl = -self.e * self.vy
+
         cmy = self.cm[-1][1] + vyl * self.dt
         self.cm.append([cmx, cmy])
         self.vy = vyl
+        self.is_coll = False
         return self.cm[-1]
     
     def get_new_rotation(self):
@@ -67,35 +76,50 @@ class Object:
         self.object = new_object
 
     def hits_ground(self):
+        # TODO: make t and n vector instead only ground
+        n = [0, 1, 0]
         for point in self.object:
-            # get rp
+
+            # get rp (vector from center of mass to point)
             rp = self.get_rp(self.cm[-1][0], self.cm[-1][1], point[0], point[1])
+
             # get cross product between rp and angular speed
-            rxw = self.get_wxrp(rp)
+            wv = [0, 0, self.wv]        # make angular speed into vector
+            wxrp = self.cross(wv, rp)
+
             # get point speed on y-axis
-            vpy = self.vy + rxw[1]
+            vpy = self.vy + wxrp[1]
 
             # check for collision on ground
             if(point[1] < 0 and vpy < 0):
 
-                rxn = abs(self.get_rxn(rp, [0, 1]))
+                # get speed in x-axis
+                vpx = self.vx + wxrp[0]
+
+                # get dot product between vp and n
+                vpn = (vpx * n[0]) + (vpy * n[1])
+
+                # get cross product between rp and n (only k)
+                rpxn = self.cross(rp, n)[2]
 
                 # get impulse
-                i = -2 * (self.vy / (1 + ((rxn)**2) / self.j))
-                
-                self.vy += i/1
+                rpxn2 = abs(rpxn)**2
+                i = -(1 + self.e) * (vpn / ((1/self.m) + rpxn2 / self.j))
+
+                self.vy = self.vy + (i / self.m) * n[1]
+                self.vx = self.vx + (i / self.m) * n[0]
+                self.wv = self.wv + (i / self.j) * rpxn
+                self.is_coll = True
 
 
     def get_rp(self, cmx, cmy, px, py):
         rpx = px - cmx
         rpy = py - cmy
-        return [rpx, rpy]
+        return [rpx, rpy, 0]
     
-    def get_wxrp(self, rp):
-        rpxwx = -self.wv * rp[1]
-        rpxwy = self.wv * rp[0]
-        return[rpxwx, rpxwy]
-    
-    def get_rxn(self, rp, n):
-        rxn = rp[0] * n[1] - rp[1] * n[0]
-        return rxn
+    def cross(self, a, b):
+        c = [a[1]*b[2] - a[2]*b[1],
+            a[2]*b[0] - a[0]*b[2],
+            a[0]*b[1] - a[1]*b[0]]
+
+        return c

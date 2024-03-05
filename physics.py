@@ -16,14 +16,14 @@ vx = v0 * cos(angle)
 vy = v0 * sin(angle)
 g = 9.81    # gravity
 t = 0.0     # time
-dt = 0.2    # delta time
+dt = 0.1    # delta time
 
 # Rotation
-wv = -100           # radians(deg)/s
+wv = 90           # radians(deg)/s
 dr = wv * dt        # radians
 
 # determine object
-obj1 = Object(xoffset, yoffset, v0, angle, wv, object1, dt)
+obj1 = Object(xoffset, yoffset, v0, angle, wv, object1, dt, 0.95, 0.03)
 
 # polygon
 polygons = []
@@ -33,10 +33,11 @@ p = Polygon(obj1.object)
 Polygon.set_fill(p, False)
 polygons.append(p)
 
-while t < 10:
+while t < 15:
 
-    obj1.update_position()
     obj1.hits_ground()
+    obj1.update_position()
+
     # TODO: 
     # - ground check
     # - nopeuden muutos
@@ -59,13 +60,17 @@ for p in polygons:
     ax.add_patch(p)
 
 # Determine plot area size
-ax.set_xlim(-5,110)
-ax.set_ylim(-5,50)
+boundsx = [-5, 210]
+boundsy = [-10, 60]   
+
+ax.set_xlim(boundsx[0],boundsx[1])
+ax.set_ylim(boundsy[0],boundsy[1])
 ax.set_aspect('equal')
 
 # draw ground
-x = [-10, 120]
-y = [-0.1, 0.1]
-plt.plot(x, y, marker = 'o', color = 'r')
+xpoints = [0.1, 0.1]
+ypoints = [boundsx[0], boundsx[1]]
+
+plt.plot(ypoints, xpoints, color = 'r')
 # show plot
 plt.show()
