@@ -4,10 +4,10 @@ from matplotlib.patches import Polygon
 from math import sin, cos, radians
 
 xoffset = 2
-yoffset = 30
+yoffset = 25
 
 # First object dimensions
-object1 = [[0.5, 2.0], [-2.0, 2.0], [-2.0, -2.0], [0.5, -2.0], [3.0, 0.0]]
+object1 = [[2.0, 2.0], [-2.0, 2.0], [-2.0, -2.0], [2.0, -2.0]]
 
 # Movement
 v0 = 17.0   # 10 m/s
@@ -19,11 +19,11 @@ t = 0.0     # time
 dt = 0.1    # delta time
 
 # Rotation
-wv = 90           # radians(deg)/s
+wv = -170           # radians(deg)/s
 dr = wv * dt        # radians
 
 # determine object
-obj1 = Object(xoffset, yoffset, v0, angle, wv, object1, dt, 0.95, 0.03)
+obj1 = Object(xoffset, yoffset, v0, angle, wv, object1, dt, 0.8, 0.03)
 
 # polygon
 polygons = []

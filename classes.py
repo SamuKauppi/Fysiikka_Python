@@ -41,14 +41,14 @@ class Object:
         cmx = self.cm[-1][0] + self.vx * self.dt
 
         if self.is_coll == False:
-            vyl = self.vy - self.g * self.dt
+            self.vy = self.vy - self.g * self.dt
         else:
-            vyl = -self.e * self.vy
+            self.vy = -self.e * self.vy
 
-        cmy = self.cm[-1][1] + vyl * self.dt
+        cmy = self.cm[-1][1] + self.vy * self.dt
         self.cm.append([cmx, cmy])
-        self.vy = vyl
         self.is_coll = False
+
         return self.cm[-1]
     
     def get_new_rotation(self):
@@ -66,12 +66,15 @@ class Object:
         return rotated_point
     
     def update_position(self):
+
         # Move center of mass
         self.get_new_cm()
         # get rotation vector
         new_object = self.get_new_rotation()
+
         # Sum center off mass and rotation
         new_object = [[x + self.cm[-1][0], y + self.cm[-1][1]] for x, y in new_object]
+            
         # Update object
         self.object = new_object
 
@@ -91,7 +94,9 @@ class Object:
             vpy = self.vy + wxrp[1]
 
             # check for collision on ground
-            if(point[1] < 0 and vpy < 0):
+            # TODO: bug that is fixed by self.vy < 0
+            # Ask Kopu
+            if(point[1] < 0 and vpy < 0 and self.vy < 0):
 
                 # get speed in x-axis
                 vpx = self.vx + wxrp[0]
@@ -106,6 +111,7 @@ class Object:
                 rpxn2 = abs(rpxn)**2
                 i = -(1 + self.e) * (vpn / ((1/self.m) + rpxn2 / self.j))
 
+                # update velocity and angular velocity
                 self.vy = self.vy + (i / self.m) * n[1]
                 self.vx = self.vx + (i / self.m) * n[0]
                 self.wv = self.wv + (i / self.j) * rpxn
