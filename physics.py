@@ -12,18 +12,18 @@ object1 = [[2.0, 2.0], [-2.0, 2.0], [-2.0, -2.0], [2.0, -2.0]]
 # Movement
 v0 = 17.0   # 10 m/s
 angle = 45
-vx = v0 * cos(angle)
-vy = v0 * sin(angle)
 g = 9.81    # gravity
 t = 0.0     # time
 dt = 0.1    # delta time
+e = 0.8
+j = 3
+m = 0.5
 
 # Rotation
-wv = -170           # radians(deg)/s
-dr = wv * dt        # radians
+wv = 10        # radians(deg)/s
 
 # determine object
-obj1 = Object(xoffset, yoffset, v0, angle, wv, object1, dt, 0.8, 0.03)
+obj1 = Object(xoffset, yoffset, v0, angle, wv, object1, dt, e, j, m)
 
 # polygon
 polygons = []
@@ -32,10 +32,17 @@ polygons = []
 p = Polygon(obj1.object)
 Polygon.set_fill(p, False)
 polygons.append(p)
+# Determine plot area size
+boundsx = [-5, 210]
+boundsy = [-10, 60]   
+
+# Determine ground size
+ypoints = [0, 0]
+xpoints = [boundsx[0], boundsx[1]]
 
 while t < 15:
 
-    obj1.hits_ground()
+    obj1.hits_ground([xpoints[1], ypoints[1]], [xpoints[0], ypoints[0]])
     obj1.update_position()
 
     # TODO: 
@@ -68,9 +75,7 @@ ax.set_ylim(boundsy[0],boundsy[1])
 ax.set_aspect('equal')
 
 # draw ground
-xpoints = [0.1, 0.1]
-ypoints = [boundsx[0], boundsx[1]]
 
-plt.plot(ypoints, xpoints, color = 'r')
+plt.plot(xpoints, ypoints, color = 'r')
 # show plot
 plt.show()
