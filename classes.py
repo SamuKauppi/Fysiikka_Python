@@ -1,5 +1,13 @@
 from math import sin, cos, radians, sqrt
 
+
+def cross(a, b):
+        c = [a[1]*b[2] - a[2]*b[1],
+            a[2]*b[0] - a[0]*b[2],
+            a[0]*b[1] - a[1]*b[0]]
+
+        return c
+
 class Object:
     def __init__(self, xoffset, yoffset, speed, angle, rot_speed, points, dt, e, j, m):
 
@@ -52,13 +60,15 @@ class Object:
         return [cmx, cmy]
 
     def hits_ground(self, g_point1, g_point2):
-        # TODO: make t and n vector instead only ground
-        a = (g_point2[1] - g_point1[1]) / (g_point2[0] - g_point1[0])
-        b = g_point1[1] - a * g_point1[0]
 
-        l = sqrt((g_point1[0] - g_point2[0])**2 + (g_point1[1] - g_point2[1])**2)
-        t = [(g_point1[0] - g_point2[0]) / l, (g_point1[1] - g_point2[1]) / l]
-        n = [-t[1], t[0], 0]
+        # get n vector
+        n = self.get_n(g_point1, g_point2)
+
+        # get a
+        a = (g_point2[1] - g_point1[1]) / (g_point2[0] - g_point1[0])
+
+        # get b
+        b = g_point1[1] - a * g_point1[0]
 
         for point in self.object:
 
@@ -67,24 +77,23 @@ class Object:
 
             # get cross product between rp and angular speed
             wv = [0, 0, self.wv]        # make angular speed into vector
-            wxrp = self.cross(wv, rp)
-
-            # get point speed on y-axis
+            wxrp = cross(wv, rp)        
+            
+            # get speeds of the point
             vpy = self.vy + wxrp[1]
+            vpx = self.vx + wxrp[0]
 
-            #axb = a * point[0] + b
+            # get dot product between vp and n
+            vpn = (vpx * n[0]) + (vpy * n[1])
+
+            # get the height of the ground at point x-pos with the function ax+b
+            axb = a * point[0] + b
             
             # check for collision on ground
-            if(point[1] < 0 and vpy < 0):
-
-                # get speed in x-axis
-                vpx = self.vx + wxrp[0]
-
-                # get dot product between vp and n
-                vpn = (vpx * n[0]) + (vpy * n[1])
+            if(point[1] < axb and vpn < 0):
 
                 # get cross product between rp and n (only k)
-                rpxn = self.cross(rp, n)[2]
+                rpxn = cross(rp, n)[2]
 
                 # get impulse
                 rpxn2 = abs(rpxn)**2
@@ -94,6 +103,7 @@ class Object:
                 self.vy = self.vy + (i / self.m) * n[1]
                 self.vx = self.vx + (i / self.m) * n[0]
                 self.wv = self.wv + (i / self.j) * rpxn
+                # set collision flag true
                 self.is_coll = True
                 break
 
@@ -103,9 +113,12 @@ class Object:
         rpy = py - cmy
         return [rpx, rpy, 0]
     
-    def cross(self, a, b):
-        c = [a[1]*b[2] - a[2]*b[1],
-            a[2]*b[0] - a[0]*b[2],
-            a[0]*b[1] - a[1]*b[0]]
 
-        return c
+    
+    def get_n(self, g_point1, g_point2):
+        # get the length from p1 to p2 (ground points)
+        l = sqrt((g_point1[0] - g_point2[0])**2 + (g_point1[1] - g_point2[1])**2)
+        # get t
+        t = [(g_point1[0] - g_point2[0]) / l, (g_point1[1] - g_point2[1]) / l]
+        # get n from t
+        return [-t[1], t[0], 0]
