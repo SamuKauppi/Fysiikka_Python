@@ -1,38 +1,7 @@
-from classes import Object, cross
+from classes import Object
+from collision import handle_coll, is_object_collision
 import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon
-
-
-def handle_coll():
-    return
-
-
-# checks collision between a point and obj
-def is_object_collision(obj, point):
- 
-    has_coll = True
-    for i in range(len(obj)):
-
-        i_next = i + 1
-        if(i_next >= len(obj)):
-            i_next = 0
-
-        # get vector from this point to next point
-        rox = obj[i_next][0] - obj[i][0]
-        roy = obj[i_next][1] - obj[i][1]
-        ro = [rox, roy, 0]
-
-        # get vector from this point to point
-        rpx = point[0] - obj[i][0]
-        rpy = point[1] - obj[i][1]
-        rp = [rpx, rpy, 0]
-
-        rxp = cross(ro, rp)[2]
-
-        if rxp < 0:
-            return False
-    
-    return has_coll
 
 # shared components
 g = 9.81    # gravity
@@ -40,30 +9,30 @@ t = 0.0     # time
 dt = 0.13    # delta time
 
 # object1 dimensions
-cmx = 2
+cmx = 52
 cmy = 25
 object1 = [[2.0, 2.0], [-2.0, 2.0], [-2.0, -2.0], [2.0, -2.0]]
 
 # object1 dimensions
-cmx2 = 150
+cmx2 = 125
 cmy2 = 25
-object2 = [[1.5, 1.5], [-1.5, 1.5], [-1.5, -1.5], [1.5, -1.5]]
+object2 = [[2, 2], [-2, 2], [-2, -2], [2, -2]]
 
 # Movement1
 v0 = 17.0   # 10 m/s
 angle = 45
 e = 0.7
 j = 3
-m = 0.5
+m = 1
 wv = 100        # radians(deg)/s
 
 # Movement2
 v02 = -17.0   # 10 m/s
 angle2 = -45
 e2 = 0.75
-j2 = 2
-m2 = 0.25
-wv2 = -100        # radians(deg)/s
+j2 = 3
+m2 = 2
+wv2 = 50        # radians(deg)/s
 
 # determine object
 obj1 = Object(cmx, cmy, v0, angle, wv, object1, dt, e, j, m)
@@ -81,40 +50,68 @@ boundsy = [-10, 60]
 ypoints = [-10, 5]
 xpoints = [boundsx[0], boundsx[1]]
 
-run = True
+color1 = "red"
+color2 = "black"
+
 while t < 15:
 
-    # create a polygon and add it to list
+    is_coll = False
+    obj1_coll = False
+
+    # check for collision in obj1
+    for point in obj1.object:
+        if is_object_collision(obj2.object, point) == True:
+            is_coll = True
+            coll_point = point
+            obj1_coll = True
+
+
+    # check for collision in obj2
+    for point in obj2.object:
+        if is_object_collision(obj1.object, point) == True:
+            is_coll = True
+            coll_point = point
+            obj1_coll = False
+
+
+    # if collsion happens, handle collsion
+    if is_coll:
+        obj1.is_coll = True
+        obj2.is_coll = True
+
+        color1 = "blue"
+        color2 = "green"
+
+        if obj1_coll == True:
+            coll = handle_coll(obj2, obj1, coll_point)
+            obj1.set_new_speeds(coll[1])
+            obj2.set_new_speeds(coll[0])
+        else:
+            coll = handle_coll(obj1, obj2, coll_point)
+            obj1.set_new_speeds(coll[0])
+            obj2.set_new_speeds(coll[1])
+
+    # Check for collisions with ground and update speeds if not colliding with other object
+    else:
+        obj1.hits_ground([xpoints[1], ypoints[1]], [xpoints[0], ypoints[0]])
+        obj2.hits_ground([xpoints[1], ypoints[1]], [xpoints[0], ypoints[0]])
+
+    # update positions
+    obj1.update_position()
+    obj2.update_position()
+
+    # create a polygon and add it to list to be drawn
     poly = Polygon(obj1.object)
     Polygon.set_fill(poly, False)
+    Polygon.set_color(poly, color2)
     polygons.append(poly)
 
     poly = Polygon(obj2.object)
     Polygon.set_fill(poly, False)
-    Polygon.set_color(poly, 'red')
+    Polygon.set_color(poly, color1)
     polygons.append(poly)
 
-    if run == False:
-        break
 
-    obj1.hits_ground([xpoints[1], ypoints[1]], [xpoints[0], ypoints[0]])
-    obj1.update_position()
-
-    obj2.hits_ground([xpoints[1], ypoints[1]], [xpoints[0], ypoints[0]])
-    obj2.update_position()
-
-    for point in obj1.object:
-        if is_object_collision(obj2.object, point) == True:
-            run = False
-    
-    for point in obj2.object:
-        if is_object_collision(obj1.object, point) == True:
-            run = False
-
-    # TODO: 
-    # - collision check toiseen objektiin
-    # 
-    
     # increment time
     t += dt
 

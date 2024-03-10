@@ -1,5 +1,7 @@
 from math import sin, cos, radians, sqrt
 
+def pythagora(a, b):
+    return sqrt((a)**2 + (b)**2)
 
 def cross(a, b):
         c = [a[1]*b[2] - a[2]*b[1],
@@ -7,6 +9,14 @@ def cross(a, b):
             a[0]*b[1] - a[1]*b[0]]
 
         return c
+
+def get_n(g_point1, g_point2):
+    # get the length from p1 to p2 (ground points)
+    l = pythagora(g_point1[0] - g_point2[0], g_point1[1] - g_point2[1])
+     # get t
+    t = [(g_point1[0] - g_point2[0]) / l, (g_point1[1] - g_point2[1]) / l]
+    # get n from t
+    return [-t[1], t[0], 0]
 
 class Object:
     def __init__(self, xoffset, yoffset, speed, angle, rot_speed, points, dt, e, j, m):
@@ -62,7 +72,7 @@ class Object:
     def hits_ground(self, g_point1, g_point2):
 
         # get n vector
-        n = self.get_n(g_point1, g_point2)
+        n = get_n(g_point1, g_point2)
 
         # get a
         a = (g_point2[1] - g_point1[1]) / (g_point2[0] - g_point1[0])
@@ -113,12 +123,8 @@ class Object:
         rpy = py - cmy
         return [rpx, rpy, 0]
     
-
+    def set_new_speeds(self, data):
+        self.vx = data[0]
+        self.vy = data[1]
+        self.wv = data[2]
     
-    def get_n(self, g_point1, g_point2):
-        # get the length from p1 to p2 (ground points)
-        l = sqrt((g_point1[0] - g_point2[0])**2 + (g_point1[1] - g_point2[1])**2)
-        # get t
-        t = [(g_point1[0] - g_point2[0]) / l, (g_point1[1] - g_point2[1]) / l]
-        # get n from t
-        return [-t[1], t[0], 0]
