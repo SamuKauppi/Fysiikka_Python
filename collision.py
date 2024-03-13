@@ -2,7 +2,7 @@ from classes import cross, get_n, pythagora
 
 def handle_coll(side_obj, coll_obj, coll_point):
 
-    # find the closest side to teh collsion point
+    # find the closest side to the collsion point
     closest_side = 0
     shortest_dist = 0
     for i in range(len(side_obj.object)):
@@ -20,28 +20,33 @@ def handle_coll(side_obj, coll_obj, coll_point):
             closest_side = [side_obj.object[i], side_obj.object[i_next]]
             shortest_dist = r
 
-
+    # collision vector
     n = get_n(closest_side[0], closest_side[1])
 
+    # get vector from cmA to point
     rapx = coll_point[0] - coll_obj.cm[0]
     rapy = coll_point[1] - coll_obj.cm[1]
     rap = [rapx, rapy, 0]
 
+    # get vector from cmB to point
     rbpx = coll_point[0] - side_obj.cm[0]
     rbpy = coll_point[1] - side_obj.cm[1]
     rbp = [rbpx, rbpy, 0]
 
+    # Cross products 
     rapxn = cross(rap, n)[2]
     rbpxn = cross(rbp, n)[2]
 
+    # Get get speeds
     wva = [0, 0, coll_obj.wv]
     vapx = coll_obj.vx + cross(wva, rap)[0]
     vapy = coll_obj.vy + cross(wva, rap)[1]
 
     wvb = [0, 0, side_obj.wv]
-    vbpx = coll_obj.vx + cross(wvb, rbp)[0]
-    vbpy = coll_obj.vy + cross(wvb, rbp)[1]
+    vbpx = side_obj.vx + cross(wvb, rbp)[0]
+    vbpy = side_obj.vy + cross(wvb, rbp)[1]
 
+    # get relative speed between each other
     vab = [vapx - vbpx, vapy - vbpy]
     vabn = vab[0] * n[0] + vab[1] * n[1]
 

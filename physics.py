@@ -19,7 +19,7 @@ cmy2 = 25
 object2 = [[2, 2], [-2, 2], [-2, -2], [2, -2]]
 
 # Movement1
-v0 = 17.0   # 10 m/s
+v0 = 20.0   # 10 m/s
 angle = 45
 e = 0.7
 j = 3
@@ -27,7 +27,7 @@ m = 1
 wv = 100        # radians(deg)/s
 
 # Movement2
-v02 = -17.0   # 10 m/s
+v02 = -20.0   # 10 m/s
 angle2 = -45
 e2 = 0.75
 j2 = 3
